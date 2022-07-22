@@ -12,3 +12,16 @@ export const LOGIN_MUTATION = gql`
     }
   }
 `;
+
+export const SAVE_BOOK_MUTATION = gql`
+  mutation login($book: Book!) {
+    login(email: $email, password: $password) {
+      user {
+        _id
+        username
+        email
+      }
+      token
+    }
+  }
+`;
