@@ -1,4 +1,5 @@
 const { AuthenticationError } = require('apollo-server-express');
+const { saveBook } = require('../../client/src/utils/API');
 const User = require('../models/User');
 const { signToken } = require('../utils/auth');
 const resolvers = {
@@ -48,6 +49,20 @@ const resolvers = {
         user,
         token,
       };
+    },
+    saveBook: async (parent, {book}, context){
+      if(context.user){
+       const user = User.findByIdAndUpdate({_id: context.user._id, }{
+          $push: (saveBook: book), 
+        }, {
+          new: true
+        })
+        return user;
+
+      }else{
+        throw new AuthenticationError("Please login to authenicaticate")
+      }
+    }
       return new AuthenticationError('Please login to authenticate');
     },
   },
