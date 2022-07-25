@@ -1,4 +1,4 @@
-import { useQuery } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import React, { useState, useEffect } from 'react';
 import {
   Jumbotron,
@@ -11,11 +11,13 @@ import {
 import { getMe, deleteBook } from '../utils/API';
 import Auth from '../utils/auth';
 import { removeBookId } from '../utils/localStorage';
+import { REMOVE_BOOK } from '../utils/mutations';
 import { ME_QUERY } from '../utils/queries';
 
 const SavedBooks = () => {
   // const [userData, setUserData] = useState({});
   const { data, loading } = useQuery(ME_QUERY);
+  const [deleteBook] = useMutation(REMOVE_BOOK);
 
   console.log({ meData: data });
 
@@ -49,7 +51,6 @@ const SavedBooks = () => {
 
   // create function that accepts the book's mongo _id value as param and deletes the book from the database
 
-  /*
   const handleDeleteBook = async (bookId) => {
     const token = Auth.loggedIn() ? Auth.getToken() : null;
 
@@ -58,14 +59,11 @@ const SavedBooks = () => {
     }
 
     try {
-      const response = await deleteBook(bookId, token);
-
-      if (!response.ok) {
-        throw new Error('something went wrong!');
-      }
-
-      const updatedUser = await response.json();
-      setUserData(updatedUser);
+      await deleteBook({
+        variables: {
+          bookId,
+        },
+      });
       // upon success, remove book's id from localStorage
       removeBookId(bookId);
     } catch (err) {
@@ -77,7 +75,7 @@ const SavedBooks = () => {
   if (loading) {
     return <h2>LOADING...</h2>;
   }
-*/
+
   const savedBooks = data?.me?.savedBooks || [];
 
   return (
@@ -112,7 +110,7 @@ const SavedBooks = () => {
                   <Card.Text>{book.description}</Card.Text>
                   <Button
                     className="btn-block btn-danger"
-                    // onClick={() => handleDeleteBook(book.bookId)}
+                    onClick={() => handleDeleteBook(book.bookId)}
                   >
                     Delete this Book!
                   </Button>

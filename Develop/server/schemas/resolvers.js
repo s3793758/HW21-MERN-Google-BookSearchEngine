@@ -31,12 +31,12 @@ const resolvers = {
       console.log({ user });
 
       if (!user) {
-        return new AuthenticationError('Invalid email');
+        return new AuthenticationError('Invalid account');
       }
 
       const isMatchingPassword = user.isCorrectPassword(password);
       if (!isMatchingPassword) {
-        return new AuthenticationError('Invalid password');
+        return new AuthenticationError('Invalid account');
       }
       const token = signToken({
         username: user.username,
@@ -54,7 +54,7 @@ const resolvers = {
         const user = User.findByIdAndUpdate(
           { _id: context.user._id },
           {
-            $push: { savedBooks: book },
+            $addToSet: { savedBooks: book },
           },
           {
             new: true,
@@ -64,6 +64,21 @@ const resolvers = {
       } else {
         return new AuthenticationError('Please login to authenticate');
       }
+    },
+    deleteBook: async (parent, { bookId }, context) => {
+      if (context.user) {
+        const user = User.findByIdAndUpdate(
+          {
+            _id: context.user._id,
+          },
+          {
+            $pull: { savedBooks: { bookId } },
+          },
+          { new: true }
+        );
+        return user;
+      }
+      return new AuthenticationError('Please login to authenticate');
     },
   },
 };
